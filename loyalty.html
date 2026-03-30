@@ -9,17 +9,33 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; }
-    body { background: #0b0b0c; font-family: 'Plus Jakarta Sans', sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+    :root {
+      --bg: #0b0b0c; --surface: #151617; --surface2: #222325;
+      --text: #fbfbf9; --muted: #4a4b4f; --muted2: #cececa;
+      --border: rgba(251,251,249,0.10); --border2: rgba(251,251,249,0.18);
+    }
+    [data-theme="light"] {
+      --bg: #f5f4f0; --surface: #eceae3; --surface2: #e2dfd7;
+      --text: #0e0e0f; --muted: #8a8a87; --muted2: #4a4948;
+      --border: rgba(14,14,15,0.09); --border2: rgba(14,14,15,0.18);
+    }
+    body { background: var(--bg); font-family: 'Plus Jakarta Sans', sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; transition: background 0.35s ease; }
     #gate { display: flex; flex-direction: column; align-items: center; gap: 2rem; }
-    .gate-label { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #4a4b4f; }
-    .gate-row { display: flex; border: 0.5px solid rgba(251,251,249,0.1); border-radius: 6px; overflow: hidden; }
-    #pw-input { background: #151617; border: none; outline: none; color: #fbfbf9; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; padding: 0.75rem 1.25rem; width: 220px; letter-spacing: 0.05em; }
-    #pw-input::placeholder { color: #4a4b4f; }
-    #pw-btn { background: #151617; border: none; border-left: 0.5px solid rgba(251,251,249,0.1); color: #cececa; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; padding: 0.75rem 1.25rem; cursor: pointer; transition: background 0.2s, color 0.2s; }
-    #pw-btn:hover { background: #222325; color: #fbfbf9; }
+    .gate-label { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+    .gate-row { display: flex; border: 0.5px solid var(--border); border-radius: 6px; overflow: hidden; }
+    #pw-input { background: var(--surface); border: none; outline: none; color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; padding: 0.75rem 1.25rem; width: 220px; letter-spacing: 0.05em; transition: background 0.35s ease; }
+    #pw-input::placeholder { color: var(--muted); }
+    #pw-btn { background: var(--surface); border: none; border-left: 0.5px solid var(--border); color: var(--muted2); font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; padding: 0.75rem 1.25rem; cursor: pointer; transition: background 0.2s, color 0.2s; }
+    #pw-btn:hover { background: var(--surface2); color: var(--text); }
     #pw-error { font-size: 12px; color: #ff6b6b; opacity: 0; transition: opacity 0.3s; height: 16px; }
     #pw-error.show { opacity: 1; }
   </style>
+  <script>
+    (function() {
+      var t = localStorage.getItem('theme');
+      if (t === 'light') document.documentElement.setAttribute('data-theme', 'light');
+    })();
+  </script>
 </head>
 <body>
   <div id="gate">
@@ -57,7 +73,88 @@
       err.classList.remove('show'); btn.textContent = '...'; btn.disabled = true;
       try {
         const html = await decrypt(pw);
-        if (html.trim().startsWith('<!') || html.trim().startsWith('<html')) { document.open(); document.write(html); document.close(); }
+        if (html.trim().startsWith('<!') || html.trim().startsWith('<html')) {
+          var _theme = localStorage.getItem('theme') || 'dark';
+          var _html = html;
+          if (_theme === 'light') _html = _html.replace('<html', '<html data-theme="light"');
+
+          /* ── inject theme CSS into <head> ── */
+          var _css = [
+            '<style id="bv-theme">',
+            /* CSS variable overrides for light mode */
+            '[data-theme=light]{',
+            '  --bg:#f5f4f0;--surface:#eceae3;--surface2:#e2dfd7;',
+            '  --text:#0e0e0f;--muted:#8a8a87;--muted2:#4a4948;',
+            '  --accent:#007a4d;--accent-high:#009e64;--accent-dim:rgba(0,122,77,.1);',
+            '  --purple:#7c3aed;--purple-dim:rgba(124,58,237,.08);',
+            '  --border:rgba(14,14,15,.09);--border-mid:rgba(14,14,15,.18);',
+            '  --nav-bg:rgba(245,244,240,.93);',
+            '}',
+            /* smooth transition on theme switch */
+            'html{transition:background .35s ease,color .35s ease;}',
+            'body{transition:background .35s ease,color .35s ease;}',
+            '[data-theme=light] body{background:#f5f4f0!important;color:#0e0e0f!important;}',
+            /* FAB button */
+            '.bv-fab{position:fixed;bottom:2rem;right:2rem;z-index:9999;',
+            '  width:36px;height:36px;border-radius:50%;',
+            '  background:rgba(21,22,23,.92);border:.5px solid rgba(251,251,249,.15);',
+            '  cursor:pointer;display:flex;align-items:center;justify-content:center;',
+            '  color:#cececa;backdrop-filter:blur(8px);',
+            '  box-shadow:0 2px 16px rgba(0,0,0,.4);transition:color .2s,background .35s;}',
+            '[data-theme=light] .bv-fab{',
+            '  background:rgba(236,234,227,.92);border-color:rgba(14,14,15,.18);',
+            '  color:#4a4948;box-shadow:0 2px 16px rgba(0,0,0,.1);}',
+            '.bv-fab:hover{color:#0e0e0f;}',
+            '[data-theme=light] .bv-fab:hover{color:#0e0e0f;}',
+            '.bv-fab svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;}',
+            '.bv-sun{display:none;}.bv-moon{display:block;}',
+            '[data-theme=light] .bv-sun{display:block;}[data-theme=light] .bv-moon{display:none;}',
+            /* nav theme overrides */
+            '[data-theme=light] nav{background:rgba(245,244,240,.93)!important;border-color:rgba(14,14,15,.09)!important;}',
+            '[data-theme=light] nav a,[data-theme=light] nav span{color:#4a4948!important;}',
+            /* nav-injected theme button */
+            '.bv-theme-btn{width:30px;height:30px;background:none;',
+            '  border:.5px solid rgba(251,251,249,.13);border-radius:3px;cursor:pointer;',
+            '  display:flex;align-items:center;justify-content:center;',
+            '  color:rgba(251,251,249,.5);transition:color .2s,border-color .2s;',
+            '  flex-shrink:0;}',
+            '[data-theme=light] .bv-theme-btn{border-color:rgba(14,14,15,.18);color:#8a8a87;}',
+            '.bv-theme-btn:hover{color:#0e0e0f;border-color:rgba(251,251,249,.3);}',
+            '[data-theme=light] .bv-theme-btn:hover{color:#0e0e0f;border-color:rgba(14,14,15,.35);}',
+            '.bv-theme-btn svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;}',
+            '</style>'
+          ].join('');
+          _html = _html.replace('</head>', _css + '</head>');
+
+          /* ── inject FAB button + toggle JS before </body> ── */
+          var _moon = '<svg class="bv-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z"></path></svg>';
+          var _sun  = '<svg class="bv-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>';
+          var _js = [
+            '<scr'+'ipt>',
+            '(function(){',
+            '  var nav=document.querySelector("nav");',
+            '  if(nav){',
+            '    var btn=document.createElement("button");',
+            '    btn.id="bvThemeBtn";',
+            '    btn.className="bv-theme-btn";',
+            '    btn.setAttribute("aria-label","Toggle theme");',
+            '    var moon=\'<svg class="bv-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z"></path></svg>\';',
+            '    var sun=\'<svg class="bv-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>\';',
+            '    btn.innerHTML=moon+sun;',
+            '    nav.appendChild(btn);',
+            '    btn.addEventListener("click",function(){',
+            '      var l=document.documentElement.getAttribute("data-theme")==="light";',
+            '      if(l){document.documentElement.removeAttribute("data-theme");localStorage.removeItem("theme");}',
+            '      else{document.documentElement.setAttribute("data-theme","light");localStorage.setItem("theme","light");}',
+            '    });',
+            '  }',
+            '})();',
+            '<\/script>'
+          ].join('');
+          _html = _html.replace('</body>', _js + '</body>');
+
+          document.open(); document.write(_html); document.close();
+        }
         else throw new Error('wrong');
       } catch(e) {
         err.classList.add('show'); btn.textContent = 'Enter →'; btn.disabled = false;
