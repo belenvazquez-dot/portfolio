@@ -74,6 +74,7 @@
       try {
         const html = await decrypt(pw);
         if (html.trim().startsWith('<!') || html.trim().startsWith('<html')) {
+          sessionStorage.setItem('bv_case_pw', pw);
           var _theme = localStorage.getItem('theme') || 'dark';
           var _html = html;
           if (_theme === 'light') _html = _html.replace('<html', '<html data-theme="light"');
@@ -163,6 +164,12 @@
     }
     document.getElementById('pw-btn').addEventListener('click', tryUnlock);
     document.getElementById('pw-input').addEventListener('keydown', e => { if (e.key === 'Enter') tryUnlock(); });
+    (function() {
+      var savedPw = sessionStorage.getItem('bv_case_pw');
+      if (!savedPw) return;
+      document.getElementById('pw-input').value = savedPw;
+      tryUnlock();
+    })();
   </script>
 </body>
 </html>

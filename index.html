@@ -308,6 +308,187 @@
   }
   .work-row:hover .work-title { color: var(--accent-high); }
 
+  /* ── CASE GATE MODAL ── */
+  .case-gate {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.28s ease;
+    z-index: 300;
+  }
+  .case-gate.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .case-gate-backdrop {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 20% 20%, rgba(255,255,255,0.45), transparent 32%),
+      radial-gradient(circle at 82% 18%, rgba(0,122,77,0.18), transparent 28%),
+      radial-gradient(circle at 50% 78%, rgba(124,58,237,0.12), transparent 36%),
+      rgba(14,14,15,0.18);
+    backdrop-filter: blur(18px) saturate(135%);
+    -webkit-backdrop-filter: blur(18px) saturate(135%);
+  }
+  [data-theme="dark"] .case-gate-backdrop {
+    background:
+      radial-gradient(circle at 20% 20%, rgba(255,255,255,0.06), transparent 32%),
+      radial-gradient(circle at 82% 18%, rgba(0,212,134,0.12), transparent 28%),
+      radial-gradient(circle at 50% 78%, rgba(194,122,255,0.10), transparent 36%),
+      rgba(11,11,12,0.52);
+  }
+  .case-gate-panel {
+    position: relative;
+    width: min(100%, 30rem);
+    padding: 1.5rem;
+    border-radius: 1.5rem;
+    background: rgba(245,244,240,0.72);
+    border: 0.5px solid rgba(255,255,255,0.55);
+    box-shadow: 0 30px 80px rgba(0,0,0,0.14);
+    backdrop-filter: blur(22px) saturate(150%);
+    -webkit-backdrop-filter: blur(22px) saturate(150%);
+  }
+  [data-theme="dark"] .case-gate-panel {
+    background: rgba(21,22,23,0.78);
+    border-color: rgba(251,251,249,0.1);
+    box-shadow: 0 30px 80px rgba(0,0,0,0.42);
+  }
+  .case-gate-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 999px;
+    border: 0.5px solid var(--border-mid);
+    background: rgba(255,255,255,0.35);
+    color: var(--muted2);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    transition: color 0.2s, border-color 0.2s, background 0.2s;
+  }
+  [data-theme="dark"] .case-gate-close { background: rgba(255,255,255,0.04); }
+  .case-gate-close:hover { color: var(--text); border-color: var(--muted); }
+  .case-gate-label {
+    display: block;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 1rem;
+  }
+  .case-gate-title {
+    font-size: clamp(1.6rem, 4vw, 2rem);
+    line-height: 1.05;
+    letter-spacing: -0.04em;
+    font-weight: 500;
+    max-width: 18rem;
+    margin-bottom: 0.75rem;
+  }
+  .case-gate-text {
+    font-size: 14px;
+    line-height: 1.65;
+    color: var(--muted2);
+    max-width: 24rem;
+    margin-bottom: 1.25rem;
+  }
+  .case-gate-row {
+    display: flex;
+    gap: 0.6rem;
+    margin-bottom: 0.65rem;
+  }
+  .case-gate-input {
+    flex: 1;
+    min-width: 0;
+    background: rgba(255,255,255,0.42);
+    border: 0.5px solid rgba(14,14,15,0.08);
+    border-radius: 999px;
+    outline: none;
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 14px;
+    padding: 0.95rem 1rem;
+  }
+  [data-theme="dark"] .case-gate-input {
+    background: rgba(255,255,255,0.05);
+    border-color: rgba(251,251,249,0.08);
+  }
+  .case-gate-input::placeholder { color: var(--muted); }
+  .case-gate-submit {
+    border: none;
+    border-radius: 999px;
+    background: var(--text);
+    color: var(--bg);
+    font-family: var(--sans);
+    font-size: 13px;
+    padding: 0.95rem 1.15rem;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+  }
+  .case-gate-submit:hover { transform: translateY(-1px); }
+  .case-gate-submit:disabled { opacity: 0.6; cursor: wait; }
+  .case-gate-error {
+    display: block;
+    min-height: 1rem;
+    font-size: 12px;
+    color: #c44d4d;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    margin-bottom: 1rem;
+  }
+  .case-gate-error.show { opacity: 1; }
+  .case-gate-note {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: 1rem;
+    background: rgba(255,255,255,0.34);
+    border: 0.5px solid rgba(255,255,255,0.5);
+  }
+  [data-theme="dark"] .case-gate-note {
+    background: rgba(255,255,255,0.04);
+    border-color: rgba(251,251,249,0.08);
+  }
+  .case-gate-note p {
+    font-size: 12.5px;
+    line-height: 1.55;
+    color: var(--muted2);
+    max-width: 15rem;
+  }
+  .case-gate-note strong {
+    display: block;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text);
+    margin-bottom: 0.45rem;
+    font-weight: 500;
+  }
+  .case-gate-link {
+    flex-shrink: 0;
+    align-self: center;
+    text-decoration: none;
+    border-radius: 999px;
+    border: 0.5px solid var(--border-mid);
+    color: var(--text);
+    font-size: 12px;
+    padding: 0.7rem 0.95rem;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .case-gate-link:hover { border-color: var(--muted); background: rgba(255,255,255,0.25); }
+
   /* EL placeholder — geometric mood grid */
   .el-visual {
     display: grid;
@@ -610,7 +791,7 @@
 
   <div class="work-table">
 
-    <a href="expressive-layer.html" class="work-row">
+    <a href="expressive-layer.html" class="work-row" data-protected-case="true">
       <span class="work-num">01</span>
       <span class="work-title">Expressive Layer</span>
       <span class="work-company">Wallapop · 2025</span>
@@ -618,7 +799,7 @@
       <span class="work-arrow">↗</span>
     </a>
 
-    <a href="loyalty.html" class="work-row">
+    <a href="loyalty.html" class="work-row" data-protected-case="true">
       <span class="work-num">02</span>
       <span class="work-title">Loyalty &amp; Retention</span>
       <span class="work-company">Wallapop · 2025</span>
@@ -626,7 +807,7 @@
       <span class="work-arrow">↗</span>
     </a>
 
-    <a href="lockers.html" class="work-row">
+    <a href="lockers.html" class="work-row" data-protected-case="true">
       <span class="work-num">03</span>
       <span class="work-title">Local Transactions / Lockers</span>
       <span class="work-company">Wallapop · 2025</span>
@@ -690,6 +871,25 @@
   </div>
 </footer></div>
 
+<div class="case-gate" id="caseGate" aria-hidden="true">
+  <div class="case-gate-backdrop" data-close-gate="true"></div>
+  <div class="case-gate-panel" role="dialog" aria-modal="true" aria-labelledby="caseGateTitle">
+    <button class="case-gate-close" id="caseGateClose" aria-label="Close password modal">×</button>
+    <span class="case-gate-label">Protected case study</span>
+    <h2 class="case-gate-title" id="caseGateTitle">Access selected work</h2>
+    <p class="case-gate-text">Some case studies are password protected because they include confidential product work. Enter the password to continue.</p>
+    <div class="case-gate-row">
+      <input class="case-gate-input" id="caseGateInput" type="password" placeholder="Enter password" autocomplete="off" />
+      <button class="case-gate-submit" id="caseGateSubmit">Enter</button>
+    </div>
+    <span class="case-gate-error" id="caseGateError">Incorrect password</span>
+    <div class="case-gate-note">
+      <p><strong>Protected by DNA</strong>This work is protected by NDA. If you’d like access, message me and I can share the password directly.</p>
+      <a href="https://www.linkedin.com/in/vazquezmbelen/" target="_blank" rel="noreferrer" class="case-gate-link">LinkedIn ↗</a>
+    </div>
+  </div>
+</div>
+
 <script>
   // Locker grid — animated availability states
   const grid = document.getElementById('lockerGrid');
@@ -719,6 +919,104 @@
       }
     }, 1500);
   }
+</script>
+
+<script>
+  const CASE_GATE_SALT_B64 = 'PAox6DFKW5UveatCXDO1pA==';
+  const CASE_GATE_DATA_B64 = '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';
+  const caseGate = document.getElementById('caseGate');
+  const caseGateInput = document.getElementById('caseGateInput');
+  const caseGateSubmit = document.getElementById('caseGateSubmit');
+  const caseGateError = document.getElementById('caseGateError');
+  const caseGateClose = document.getElementById('caseGateClose');
+  let pendingCaseHref = null;
+
+  function b64ToArr(b64) {
+    const bin = atob(b64);
+    const arr = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+    return arr;
+  }
+
+  async function decryptCase(password) {
+    const salt = b64ToArr(CASE_GATE_SALT_B64);
+    const data = b64ToArr(CASE_GATE_DATA_B64);
+    const enc = new TextEncoder();
+    const keyMaterial = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveBits']);
+    const keyBits = await crypto.subtle.deriveBits({ name: 'PBKDF2', salt, iterations: 200000, hash: 'SHA-256' }, keyMaterial, 256);
+    const keyArr = new Uint8Array(keyBits);
+    const result = new Uint8Array(data.length);
+    let offset = 0;
+    let counter = 0;
+    while (offset < data.length) {
+      const cb = new Uint8Array(4);
+      new DataView(cb.buffer).setUint32(0, counter, false);
+      const block = new Uint8Array(await crypto.subtle.digest('SHA-256', new Uint8Array([...keyArr, ...cb])));
+      for (let i = 0; i < block.length && offset < data.length; i++, offset++) result[offset] = data[offset] ^ block[i];
+      counter++;
+    }
+    return new TextDecoder().decode(result);
+  }
+
+  function openCaseGate(href) {
+    pendingCaseHref = href;
+    caseGate.classList.add('open');
+    caseGate.setAttribute('aria-hidden', 'false');
+    caseGateError.classList.remove('show');
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => caseGateInput.focus(), 40);
+  }
+
+  function closeCaseGate() {
+    caseGate.classList.remove('open');
+    caseGate.setAttribute('aria-hidden', 'true');
+    caseGateError.classList.remove('show');
+    caseGateSubmit.disabled = false;
+    caseGateSubmit.textContent = 'Enter';
+    caseGateInput.value = '';
+    document.body.style.overflow = '';
+  }
+
+  async function submitCaseGate() {
+    const pw = caseGateInput.value;
+    if (!pw) return;
+    caseGateError.classList.remove('show');
+    caseGateSubmit.disabled = true;
+    caseGateSubmit.textContent = '...';
+    try {
+      const html = await decryptCase(pw);
+      if (!html.trim().startsWith('<!') && !html.trim().startsWith('<html')) throw new Error('wrong');
+      sessionStorage.setItem('bv_case_pw', pw);
+      window.location.href = pendingCaseHref;
+    } catch (e) {
+      caseGateError.classList.add('show');
+      caseGateSubmit.disabled = false;
+      caseGateSubmit.textContent = 'Enter';
+      caseGateInput.select();
+    }
+  }
+
+  document.querySelectorAll('[data-protected-case="true"]').forEach(link => {
+    link.addEventListener('click', event => {
+      const savedPw = sessionStorage.getItem('bv_case_pw');
+      if (savedPw) return;
+      event.preventDefault();
+      openCaseGate(link.getAttribute('href'));
+    });
+  });
+
+  caseGateSubmit.addEventListener('click', submitCaseGate);
+  caseGateInput.addEventListener('keydown', event => {
+    if (event.key === 'Enter') submitCaseGate();
+    if (event.key === 'Escape') closeCaseGate();
+  });
+  caseGateClose.addEventListener('click', closeCaseGate);
+  caseGate.addEventListener('click', event => {
+    if (event.target && event.target.dataset.closeGate === 'true') closeCaseGate();
+  });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && caseGate.classList.contains('open')) closeCaseGate();
+  });
 </script>
 
 <script>
